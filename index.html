@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎂 Happy Birthday 🎂</title>
+  <style>
+    body {
+      text-align: center;
+      background: #fff0f5;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      color: #d63384;
+    }
+    .cake {
+      position: relative;
+      margin: 30px auto;
+      width: 300px;
+      height: 250px;
+      background: url("https://i.ibb.co/vv6bXWn/cake.png") no-repeat center/cover;
+    }
+    .candle {
+      width: 6px;
+      height: 40px;
+      background: yellow;
+      display: inline-block;
+      position: absolute;
+      bottom: 180px; /* مكان الشموع فوق الكيكة */
+    }
+    .flame {
+      width: 12px;
+      height: 15px;
+      background: orange;
+      border-radius: 50%;
+      position: absolute;
+      top: -18px;
+      left: -3px;
+    }
+  </style>
+</head>
+<body>
+  <h1>H.B.D Ninjaaaa ♥️</h1>
+  <div class="cake" id="cake"></div>
+  <p>🎤 انفخي في المايك علشان تطفي الشموع 🎤</p>
+
+  <script>
+    const cake = document.getElementById("cake");
+    const cakeWidth = 300;
+
+    // اعملي 29 شمعة
+    for (let i = 0; i < 29; i++) {
+      const candle = document.createElement("div");
+      candle.classList.add("candle");
+      const flame = document.createElement("div");
+      flame.classList.add("flame");
+      candle.appendChild(flame);
+
+      // وزعي الشموع عرضيًا فوق الكيكة
+      let x = (i % 10) * (cakeWidth / 10) + 10;
+      let y = Math.floor(i / 10) * 20;
+      candle.style.left = x + "px";
+      candle.style.bottom = (180 + y) + "px";
+
+      cake.appendChild(candle);
+    }
+
+    // تسجيل صوت المايك
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      const audioCtx = new AudioContext();
+      const mic = audioCtx.createMediaStreamSource(stream);
+      const analyser = audioCtx.createAnalyser();
+      mic.connect(analyser);
+      const data = new Uint8Array(analyser.fftSize);
+
+      function checkBlow() {
+        analyser.getByteTimeDomainData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) {
+          sum += Math.abs(data[i] - 128);
+        }
+        let volume = sum / data.length;
+        if (volume > 15) { // لو النفخة عالية
+          document.querySelectorAll(".flame").forEach(f => f.style.display = "none");
+        }
+        requestAnimationFrame(checkBlow);
+      }
+      checkBlow();
+    });
+  </script>
+</body>
+</html>
